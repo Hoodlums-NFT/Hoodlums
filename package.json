@@ -7,6 +7,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@flowtyio/flow-contracts": "^0.0.18"
+    "@flowtyio/flow-contracts": "github:flowtyio/flow-contracts#crescendo"
   }
 }

@@ -2,19 +2,20 @@ import "FungibleToken"
 import "NonFungibleToken"
 import "MetadataViews"
 import "HoodlumsMetadata"
+import "ViewResolver"
 
 // SturdyItems
 // NFT items for Sturdy!
 //
-pub contract SturdyItems: NonFungibleToken {
+access(all) contract SturdyItems: ViewResolver {
 
     // Events
     //
-    pub event ContractInitialized()
-    pub event AccountInitialized()
-    pub event Withdraw(id: UInt64, from: Address?)
-    pub event Deposit(id: UInt64, to: Address?)
-    pub event Minted(id: UInt64, 
+    access(all) event ContractInitialized()
+    access(all) event AccountInitialized()
+    access(all) event Withdraw(id: UInt64, from: Address?)
+    access(all) event Deposit(id: UInt64, to: Address?)
+    access(all) event Minted(id: UInt64, 
     	typeID: UInt64, 
 		tokenURI: String, 
 		tokenTitle: String, 
@@ -22,47 +23,47 @@ pub contract SturdyItems: NonFungibleToken {
 		artist: String, 
 		secondaryRoyalty: String, 
 		platformMintedOn: String)
-    pub event Purchased(buyer: Address, id: UInt64, price: UInt64)
+    access(all) event Purchased(buyer: Address, id: UInt64, price: UInt64)
 
     // Named Paths
     //
-    pub let CollectionStoragePath: StoragePath
-    pub let CollectionPublicPath: PublicPath
-    pub let MinterStoragePath: StoragePath
+    access(all) let CollectionStoragePath: StoragePath
+    access(all) let CollectionPublicPath: PublicPath
+    access(all) let MinterStoragePath: StoragePath
 
     // totalSupply
     // The total number of SturdyItems that have been minted
     //
-    pub var totalSupply: UInt64
+    access(all) var totalSupply: UInt64
 
     // NFT
     // A Sturdy Item as an NFT
     //
-    pub resource NFT: NonFungibleToken.INFT, MetadataViews.Resolver {
+    access(all) resource NFT: NonFungibleToken.NFT, ViewResolver.Resolver {
         // The token's ID
-        pub let id: UInt64
+        access(all) let id: UInt64
         // The token's type, e.g. 3 == Hat
-        pub let typeID: UInt64
+        access(all) let typeID: UInt64
         // Token URI
-        pub let tokenURI: String
+        access(all) let tokenURI: String
         // Token Title
-        pub let tokenTitle: String
+        access(all) let tokenTitle: String
         // Token Description
-        pub let tokenDescription: String
+        access(all) let tokenDescription: String
         // Artist info
-        pub let artist: String
+        access(all) let artist: String
         // Secondary Royalty
-        pub let secondaryRoyalty: String
+        access(all) let secondaryRoyalty: String
         // Platform Minted On
-        pub let platformMintedOn: String
+        access(all) let platformMintedOn: String
         // Token Price
-        // pub let price: UInt64
+        // access(all) let price: UInt64
 
-        pub fun getViews(): [Type] {
-            let metadata = HoodlumsMetadata.getMetadata(tokenID: self.id)
-            if (metadata == nil) {
-                return []
-            }
+        access(all) view fun getViews(): [Type] {
+            //let metadata = HoodlumsMetadata.getMetadata(tokenID: self.id)
+            // if (metadata == nil) {
+            //     return []
+            // }
             return [
                 Type<MetadataViews.ExternalURL>(),
                 Type<MetadataViews.NFTCollectionData>(),
@@ -73,7 +74,7 @@ pub contract SturdyItems: NonFungibleToken {
             ]
         }
 
-        pub fun resolveView(_ view: Type): AnyStruct? {
+        access(all) fun resolveView(_ view: Type): AnyStruct? {
             let metadata = HoodlumsMetadata.getMetadata(tokenID: self.id)
             let thumbnailCID = metadata!["thumbnailCID"] != nil ? metadata!["thumbnailCID"]! : metadata!["imageCID"]!
             switch view {
@@ -83,11 +84,9 @@ pub contract SturdyItems: NonFungibleToken {
                     return MetadataViews.NFTCollectionData(
                         storagePath: SturdyItems.CollectionStoragePath,
                         publicPath: SturdyItems.CollectionPublicPath,
-                        providerPath: /private/SturdyItemsCollection,
-                        publicCollection: Type<&SturdyItems.Collection{SturdyItems.SturdyItemsCollectionPublic}>(),
-                        publicLinkedType: Type<&SturdyItems.Collection{SturdyItems.SturdyItemsCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}>(),
-                        providerLinkedType: Type<&SturdyItems.Collection{SturdyItems.SturdyItemsCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}>(),
-                        createEmptyCollectionFunction: (fun (): @NonFungibleToken.Collection {
+                        publicCollection: Type<&SturdyItems.Collection>(),
+                        publicLinkedType: Type<&SturdyItems.Collection>(),
+                        createEmptyCollectionFunction: (fun (): @{NonFungibleToken.Collection} {
                             return <-SturdyItems.createEmptyCollection()
                         })
                     )
@@ -131,13 +130,13 @@ pub contract SturdyItems: NonFungibleToken {
                         [
                             MetadataViews.Royalty(
                             receiver: getAccount(HoodlumsMetadata.sturdyRoyaltyAddress)
-                                    .getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver),
+                                    .capabilities.get<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver),
                                 cut: HoodlumsMetadata.sturdyRoyaltyCut,
                                 description: "Sturdy Royalty"
                             ),
                             MetadataViews.Royalty(
                                 receiver: getAccount(HoodlumsMetadata.artistRoyaltyAddress)
-                                    .getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver),
+                                    .capabilities.get<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver),
                                 cut: HoodlumsMetadata.artistRoyaltyCut,
                                 description: "Artist Royalty"
                             )
@@ -145,6 +144,10 @@ pub contract SturdyItems: NonFungibleToken {
                     )
             }
             return nil
+        }
+
+        access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
+            return <- SturdyItems.createEmptyCollection()
         }
 
         // initializer
@@ -172,11 +175,9 @@ pub contract SturdyItems: NonFungibleToken {
     // This is the interface that users can cast their SturdyItems Collection as
     // to allow others to deposit SturdyItems into their Collection. It also allows for reading
     // the details of SturdyItems in the Collection.
-    pub resource interface SturdyItemsCollectionPublic {
-        pub fun deposit(token: @NonFungibleToken.NFT)
-        pub fun getIDs(): [UInt64]
-        pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT
-        pub fun borrowSturdyItem(id: UInt64): &SturdyItems.NFT? {
+    access(all) resource interface SturdyItemsCollectionPublic: NonFungibleToken.Collection {
+        access(all) fun deposit(token: @{NonFungibleToken.NFT})
+        access(all) fun borrowSturdyItem(id: UInt64): &SturdyItems.NFT? {
             // If the result isn't nil, the id of the returned reference
             // should be the same as the argument to the function
             post {
@@ -189,16 +190,16 @@ pub contract SturdyItems: NonFungibleToken {
     // Collection
     // A collection of SturdyItem NFTs owned by an account
     //
-    pub resource Collection: SturdyItemsCollectionPublic, NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection {
+    access(all) resource Collection: SturdyItemsCollectionPublic {
         // dictionary of NFT conforming tokens
         // NFT is a resource type with an `UInt64` ID field
         //
-        pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
+        access(all) var ownedNFTs: @{UInt64: {NonFungibleToken.NFT}}
 
         // withdraw
         // Removes an NFT from the collection and moves it to the caller
         //
-        pub fun withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {
+        access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
             let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("missing NFT")
 
             emit Withdraw(id: token.id, from: self.owner?.address)
@@ -210,7 +211,7 @@ pub contract SturdyItems: NonFungibleToken {
         // Takes a NFT and adds it to the collections dictionary
         // and adds the ID to the id array
         //
-        pub fun deposit(token: @NonFungibleToken.NFT) {
+        access(all) fun deposit(token: @{NonFungibleToken.NFT}) {
             let token <- token as! @SturdyItems.NFT
 
             let id: UInt64 = token.id
@@ -226,7 +227,7 @@ pub contract SturdyItems: NonFungibleToken {
         // getIDs
         // Returns an array of the IDs that are in the collection
         //
-        pub fun getIDs(): [UInt64] {
+        access(all) view fun getIDs(): [UInt64] {
             return self.ownedNFTs.keys
         }
 
@@ -234,8 +235,8 @@ pub contract SturdyItems: NonFungibleToken {
         // Gets a reference to an NFT in the collection
         // so that the caller can read its metadata and call its methods
         //
-        pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT {
-            return (&self.ownedNFTs[id] as &NonFungibleToken.NFT?)!
+        access(all) view fun borrowNFT(_ id: UInt64): &{NonFungibleToken.NFT}? {
+            return (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?)!
         }
 
         // borrowSturdyItem
@@ -243,24 +244,33 @@ pub contract SturdyItems: NonFungibleToken {
         // exposing all of its fields (including the typeID).
         // This is safe as there are no functions that can be called on the SturdyItem.
         //
-        pub fun borrowSturdyItem(id: UInt64): &SturdyItems.NFT? {
+        access(all) fun borrowSturdyItem(id: UInt64): &SturdyItems.NFT? {
             if self.ownedNFTs[id] != nil {
-                let ref = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
+                let ref = (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?)!
                 return ref as! &SturdyItems.NFT
             } else {
                 return nil
             }
         }
 
-        pub fun borrowViewResolver(id: UInt64): &AnyResource{MetadataViews.Resolver} {
-            let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
-            let exampleNFT = nft as! &SturdyItems.NFT
-            return exampleNFT as &AnyResource{MetadataViews.Resolver}
+
+        access(all) view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver} {
+            let nft = (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?)!
+            return nft as! &SturdyItems.NFT
         }
 
-        // destructor
-        destroy() {
-            destroy self.ownedNFTs
+        access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
+            return <- create Collection()
+        }
+
+        access(all) view fun getSupportedNFTTypes(): {Type: Bool} {
+            return {
+                Type<@SturdyItems.NFT>(): true
+            }
+        }
+
+        access(all) view fun isSupportedNFTType(type: Type): Bool {
+            return type == Type<@SturdyItems.NFT>()
         }
 
         // initializer
@@ -273,7 +283,7 @@ pub contract SturdyItems: NonFungibleToken {
     // createEmptyCollection
     // public function that anyone can call to create a new empty collection
     //
-    pub fun createEmptyCollection(): @NonFungibleToken.Collection {
+    access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
         emit AccountInitialized()
         return <- create Collection()
     }
@@ -281,7 +291,7 @@ pub contract SturdyItems: NonFungibleToken {
     // purchased
     // Remain price information
     //
-    pub fun purchased(recipient: Address, tokenID: UInt64, price: UInt64): UInt64 {
+    access(all) fun purchased(recipient: Address, tokenID: UInt64, price: UInt64): UInt64 {
         emit Purchased(buyer: recipient, id: tokenID, price: price)
         return tokenID
     }
@@ -291,7 +301,7 @@ pub contract SturdyItems: NonFungibleToken {
     // Resource that an admin or something similar would own to be
     // able to mint new NFTs
     //
-	pub resource NFTMinter {
+	access(all) resource NFTMinter {
 
 		// mintNFT
         // Mints a new NFT with a new ID
@@ -300,7 +310,7 @@ pub contract SturdyItems: NonFungibleToken {
         // price: UInt64
         // price: price
         // initPrice: price
-		pub fun mintNFT(recipient: &{NonFungibleToken.CollectionPublic}, 
+		access(all) fun mintNFT(recipient: &{NonFungibleToken.CollectionPublic}, 
 			typeID: UInt64, 
 			tokenURI: String, 
 			tokenTitle: String, 
@@ -321,7 +331,7 @@ pub contract SturdyItems: NonFungibleToken {
             )
 
 			// deposit it in the recipient's account using their reference
-			recipient.deposit(token: <-create SturdyItems.NFT(
+			recipient.deposit(token: <-create NFT(
 				initID: SturdyItems.totalSupply, 
 				initTypeID: typeID, 
 				initTokenURI: tokenURI,
@@ -340,14 +350,66 @@ pub contract SturdyItems: NonFungibleToken {
     // If it has a collection but does not contain the itemId, return nil.
     // If it has a collection and that collection contains the itemId, return a reference to that.
     //
-    pub fun fetch(_ from: Address, itemID: UInt64): &SturdyItems.NFT? {
-        let collection = getAccount(from)
-            .getCapability(SturdyItems.CollectionPublicPath)!
-            .borrow<&SturdyItems.Collection{SturdyItems.SturdyItemsCollectionPublic}>()
+    access(all) fun fetch(_ from: Address, itemID: UInt64): &SturdyItems.NFT? {
+        let collection = getAccount(from).capabilities
+            .get<&SturdyItems.Collection>(SturdyItems.CollectionPublicPath)
+            .borrow()
             ?? panic("Couldn't get collection")
         // We trust SturdyItems.Collection.borowSturdyItem to get the correct itemID
         // (it checks it before returning it).
         return collection.borrowSturdyItem(id: itemID)
+    }
+
+    /// Function that resolves a metadata view for this contract.
+    ///
+    /// @param view: The Type of the desired view.
+    /// @return A structure representing the requested view.
+    ///
+    access(all) fun resolveContractView(resourceType: Type?, viewType: Type): AnyStruct? {
+        switch viewType {
+            case Type<MetadataViews.NFTCollectionData>():
+                return MetadataViews.NFTCollectionData(
+                        storagePath: SturdyItems.CollectionStoragePath,
+                        publicPath: SturdyItems.CollectionPublicPath,
+                        publicCollection: Type<&SturdyItems.Collection>(),
+                        publicLinkedType: Type<&SturdyItems.Collection>(),
+                        createEmptyCollectionFunction: (fun (): @{NonFungibleToken.Collection} {
+                            return <-SturdyItems.createEmptyCollection()
+                        })
+                )
+            case Type<MetadataViews.NFTCollectionDisplay>():
+                    let media = MetadataViews.Media(
+                        file: MetadataViews.HTTPFile(url: "https://ipfs.io/ipfs/bafkreigos42bix6eyvdqwgsbpwwpiemttt772g7ql5khsrutzrfflc4bpq"),
+                        mediaType: "image/jpeg"
+                    )
+                // let media = MetadataViews.Media(
+                //     file: MetadataViews.HTTPFile(
+                //         url: "https://assets.website-files.com/5f6294c0c7a8cdd643b1c820/5f6294c0c7a8cda55cb1c936_Flow_Wordmark.svg"
+                //     ),
+                //     mediaType: "image/svg+xml"
+                // )
+                return MetadataViews.NFTCollectionDisplay(
+                        name: "Hoodlums",
+                        description: "",
+                        externalURL: MetadataViews.ExternalURL("https://hoodlumsnft.com/"),
+                        squareImage: media,
+                        bannerImage: media,
+                        socials: {}
+                    )
+        }
+        return nil
+    }
+
+    /// Function that returns all the Metadata Views implemented by a Non Fungible Token
+    ///
+    /// @return An array of Types defining the implemented views. This value will be used by
+    ///         developers to know which parameter to pass to the resolveView() method.
+    ///
+    access(all) view fun getContractViews(resourceType: Type?): [Type] {
+        return [
+            Type<MetadataViews.NFTCollectionData>(),
+            Type<MetadataViews.NFTCollectionDisplay>()
+        ]
     }
 
     // initializer
@@ -363,7 +425,7 @@ pub contract SturdyItems: NonFungibleToken {
 
         // Create a Minter resource and save it to storage
         let minter <- create NFTMinter()
-        self.account.save(<-minter, to: self.MinterStoragePath)
+        self.account.storage.save(<-minter, to: self.MinterStoragePath)
 
         emit ContractInitialized()
 	}
