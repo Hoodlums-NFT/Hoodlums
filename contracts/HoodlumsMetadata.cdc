@@ -34,7 +34,7 @@ access(all) contract HoodlumsMetadata {
     }
   }
 
-  access(all) fun getMetadata(tokenID: UInt64): {String: String}? {
+  access(all) view fun getMetadata(tokenID: UInt64): {String: String}? {
     return HoodlumsMetadata.metadata[tokenID]
   }
 
