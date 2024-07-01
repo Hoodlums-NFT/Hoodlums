@@ -177,7 +177,7 @@ access(all) contract SturdyItems: ViewResolver {
     // the details of SturdyItems in the Collection.
     access(all) resource interface SturdyItemsCollectionPublic: NonFungibleToken.Collection {
         access(all) fun deposit(token: @{NonFungibleToken.NFT})
-        access(all) fun borrowSturdyItem(id: UInt64): &SturdyItems.NFT? {
+        access(all) view fun borrowSturdyItem(id: UInt64): &SturdyItems.NFT? {
             // If the result isn't nil, the id of the returned reference
             // should be the same as the argument to the function
             post {
@@ -244,7 +244,7 @@ access(all) contract SturdyItems: ViewResolver {
         // exposing all of its fields (including the typeID).
         // This is safe as there are no functions that can be called on the SturdyItem.
         //
-        access(all) fun borrowSturdyItem(id: UInt64): &SturdyItems.NFT? {
+        access(all) view fun borrowSturdyItem(id: UInt64): &SturdyItems.NFT? {
             if self.ownedNFTs[id] != nil {
                 let ref = (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?)!
                 return ref as! &SturdyItems.NFT
@@ -259,10 +259,6 @@ access(all) contract SturdyItems: ViewResolver {
             return nft as! &SturdyItems.NFT
         }
 
-        access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
-            return <- create Collection()
-        }
-
         access(all) view fun getSupportedNFTTypes(): {Type: Bool} {
             return {
                 Type<@SturdyItems.NFT>(): true
@@ -273,8 +269,10 @@ access(all) contract SturdyItems: ViewResolver {
             return type == Type<@SturdyItems.NFT>()
         }
 
-        // initializer
-        //
+        access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
+            return <- create Collection()
+        }
+
         init () {
             self.ownedNFTs <- {}
         }
@@ -382,19 +380,15 @@ access(all) contract SturdyItems: ViewResolver {
                         file: MetadataViews.HTTPFile(url: "https://ipfs.io/ipfs/bafkreigos42bix6eyvdqwgsbpwwpiemttt772g7ql5khsrutzrfflc4bpq"),
                         mediaType: "image/jpeg"
                     )
-                // let media = MetadataViews.Media(
-                //     file: MetadataViews.HTTPFile(
-                //         url: "https://assets.website-files.com/5f6294c0c7a8cdd643b1c820/5f6294c0c7a8cda55cb1c936_Flow_Wordmark.svg"
-                //     ),
-                //     mediaType: "image/svg+xml"
-                // )
                 return MetadataViews.NFTCollectionDisplay(
                         name: "Hoodlums",
                         description: "",
-                        externalURL: MetadataViews.ExternalURL("https://hoodlumsnft.com/"),
+                        externalURL: MetadataViews.ExternalURL("https://www.flowty.io/collection/0x427ceada271aa0b1/SturdyItems"),
                         squareImage: media,
                         bannerImage: media,
-                        socials: {}
+                        socials: {
+                            "twitter": MetadataViews.ExternalURL("https://x.com/HoodlumsNFT")
+                        }
                     )
         }
         return nil
