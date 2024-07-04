@@ -73,8 +73,8 @@ access(all) contract SturdyItems: ViewResolver {
         }
 
         access(all) fun resolveView(_ view: Type): AnyStruct? {
-            let metadata = HoodlumsMetadata.getMetadata(tokenID: self.id)
-            let thumbnailCID = metadata!["thumbnailCID"] != nil ? metadata!["thumbnailCID"]! : metadata!["imageCID"]!
+            let newCID = "QmTPGjR5TN2QLMm6VN2Ux81NK955qqgvrjQkCwNDqW73fs"
+            let thumbnailCID = newCID.concat("/someHoodlum_").concat(self.id.toString()).concat(".png")
             switch view {
                 case Type<MetadataViews.NFTView>():
                     let viewResolver = &self as &{ViewResolver.Resolver}
@@ -126,17 +126,14 @@ access(all) contract SturdyItems: ViewResolver {
                     return metadata
                 case Type<MetadataViews.Medias>():
                     let medias: [MetadataViews.Media] = [];
-                    let imageCID = metadata!["imageCID"]
-                    if imageCID != nil {
                         medias.append(
                             MetadataViews.Media(
                                 file: MetadataViews.HTTPFile(
                                     url: "https://ipfs.io/ipfs/".concat(thumbnailCID)
                                 ),
-                                mediaType: "image/jpeg"
+                                mediaType: "image/png"
                             )
                         )
-                    }
                     return MetadataViews.Medias(medias)
                 case Type<MetadataViews.Royalties>():
                     return MetadataViews.Royalties(
