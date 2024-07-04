@@ -39,7 +39,7 @@ access(all) contract SturdyItems: ViewResolver {
     // NFT
     // A Sturdy Item as an NFT
     //
-    access(all) resource NFT: NonFungibleToken.NFT, ViewResolver.Resolver {
+    access(all) resource NFT: NonFungibleToken.NFT {
         // The token's ID
         access(all) let id: UInt64
         // The token's type, e.g. 3 == Hat
@@ -60,15 +60,13 @@ access(all) contract SturdyItems: ViewResolver {
         // access(all) let price: UInt64
 
         access(all) view fun getViews(): [Type] {
-            //let metadata = HoodlumsMetadata.getMetadata(tokenID: self.id)
-            // if (metadata == nil) {
-            //     return []
-            // }
             return [
+                Type<MetadataViews.NFTView>(),
+                Type<MetadataViews.Display>(),
                 Type<MetadataViews.ExternalURL>(),
                 Type<MetadataViews.NFTCollectionData>(),
                 Type<MetadataViews.NFTCollectionDisplay>(),
-                Type<MetadataViews.Display>(),
+                Type<MetadataViews.Traits>(),
                 Type<MetadataViews.Medias>(),
                 Type<MetadataViews.Royalties>()
             ]
@@ -78,6 +76,26 @@ access(all) contract SturdyItems: ViewResolver {
             let metadata = HoodlumsMetadata.getMetadata(tokenID: self.id)
             let thumbnailCID = metadata!["thumbnailCID"] != nil ? metadata!["thumbnailCID"]! : metadata!["imageCID"]!
             switch view {
+                case Type<MetadataViews.NFTView>():
+                    let viewResolver = &self as &{ViewResolver.Resolver}
+                    return MetadataViews.NFTView(
+                        id: self.id,
+                        uuid: self.uuid,
+                        display: MetadataViews.getDisplay(viewResolver),
+                        externalURL: MetadataViews.getExternalURL(viewResolver),
+                        collectionData: MetadataViews.getNFTCollectionData(viewResolver),
+                        collectionDisplay: MetadataViews.getNFTCollectionDisplay(viewResolver),
+                        royalties: MetadataViews.getRoyalties(viewResolver),
+                        traits: MetadataViews.getTraits(viewResolver)
+                    )
+                case Type<MetadataViews.Display>():
+                    return MetadataViews.Display(
+                        name: self.tokenTitle,
+                        description: self.tokenDescription,
+                        thumbnail: MetadataViews.HTTPFile(
+                            url: "https://ipfs.io/ipfs/".concat(thumbnailCID)
+                        )
+                    )
                 case Type<MetadataViews.ExternalURL>():
                     return MetadataViews.ExternalURL("https://ipfs.io/ipfs/".concat(thumbnailCID))
                 case Type<MetadataViews.NFTCollectionData>():
@@ -92,7 +110,7 @@ access(all) contract SturdyItems: ViewResolver {
                     )
                 case Type<MetadataViews.NFTCollectionDisplay>():
                     let media = MetadataViews.Media(
-                        file: MetadataViews.HTTPFile(url: "https://ipfs.io/ipfs/bafkreigos42bix6eyvdqwgsbpwwpiemttt772g7ql5khsrutzrfflc4bpq"),
+                        file: MetadataViews.IPFSFile(cid: "bafkreigos42bix6eyvdqwgsbpwwpiemttt772g7ql5khsrutzrfflc4bpq", path: nil),
                         mediaType: "image/jpeg"
                     )
                     return MetadataViews.NFTCollectionDisplay(
@@ -103,14 +121,9 @@ access(all) contract SturdyItems: ViewResolver {
                         bannerImage: media,
                         socials: {}
                     )
-                case Type<MetadataViews.Display>():
-                    return MetadataViews.Display(
-                        name: self.tokenTitle,
-                        description: self.tokenDescription,
-                        thumbnail: MetadataViews.HTTPFile(
-                            url: "https://ipfs.io/ipfs/".concat(thumbnailCID)
-                        )
-                    )
+                case Type<MetadataViews.Traits>():
+                    var metadata = HoodlumsMetadata.getMetadata(tokenID: self.id)
+                    return metadata
                 case Type<MetadataViews.Medias>():
                     let medias: [MetadataViews.Media] = [];
                     let imageCID = metadata!["imageCID"]
@@ -350,12 +363,13 @@ access(all) contract SturdyItems: ViewResolver {
     //
     access(all) fun fetch(_ from: Address, itemID: UInt64): &SturdyItems.NFT? {
         let collection = getAccount(from).capabilities
-            .get<&SturdyItems.Collection>(SturdyItems.CollectionPublicPath)
+            .get<&{NonFungibleToken.Collection}>(SturdyItems.CollectionPublicPath)
             .borrow()
             ?? panic("Couldn't get collection")
+        let sturdyCollection = collection as! &SturdyItems.Collection
         // We trust SturdyItems.Collection.borowSturdyItem to get the correct itemID
         // (it checks it before returning it).
-        return collection.borrowSturdyItem(id: itemID)
+        return sturdyCollection.borrowSturdyItem(id: itemID)
     }
 
     /// Function that resolves a metadata view for this contract.
@@ -377,7 +391,7 @@ access(all) contract SturdyItems: ViewResolver {
                 )
             case Type<MetadataViews.NFTCollectionDisplay>():
                     let media = MetadataViews.Media(
-                        file: MetadataViews.HTTPFile(url: "https://ipfs.io/ipfs/bafkreigos42bix6eyvdqwgsbpwwpiemttt772g7ql5khsrutzrfflc4bpq"),
+                        file: MetadataViews.IPFSFile(cid: "bafkreigos42bix6eyvdqwgsbpwwpiemttt772g7ql5khsrutzrfflc4bpq", path: nil),
                         mediaType: "image/jpeg"
                     )
                 return MetadataViews.NFTCollectionDisplay(
@@ -402,7 +416,8 @@ access(all) contract SturdyItems: ViewResolver {
     access(all) view fun getContractViews(resourceType: Type?): [Type] {
         return [
             Type<MetadataViews.NFTCollectionData>(),
-            Type<MetadataViews.NFTCollectionDisplay>()
+            Type<MetadataViews.NFTCollectionDisplay>(),
+            Type<MetadataViews.ExternalURL>()
         ]
     }
 
