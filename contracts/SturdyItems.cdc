@@ -73,8 +73,7 @@ access(all) contract SturdyItems: ViewResolver {
         }
 
         access(all) fun resolveView(_ view: Type): AnyStruct? {
-            let newCID = "QmTPGjR5TN2QLMm6VN2Ux81NK955qqgvrjQkCwNDqW73fs"
-            let thumbnailCID = newCID.concat("/someHoodlum_").concat(self.id.toString()).concat(".png")
+
             switch view {
                 case Type<MetadataViews.NFTView>():
                     let viewResolver = &self as &{ViewResolver.Resolver}
@@ -92,11 +91,12 @@ access(all) contract SturdyItems: ViewResolver {
                     return MetadataViews.Display(
                         name: self.tokenTitle,
                         description: self.tokenDescription,
-                        thumbnail: MetadataViews.HTTPFile(
-                            url: "https://ipfs.io/ipfs/".concat(thumbnailCID)
-                        )
+                        thumbnail: MetadataViews.IPFSFile(cid: "QmTPGjR5TN2QLMm6VN2Ux81NK955qqgvrjQkCwNDqW73fs", path: "someHoodlum_".concat(self.id.toString()).concat(".png")),
                     )
                 case Type<MetadataViews.ExternalURL>():
+                    let newCID = "QmTPGjR5TN2QLMm6VN2Ux81NK955qqgvrjQkCwNDqW73fs"
+                    let thumbnailCID = newCID.concat("/someHoodlum_").concat(self.id.toString()).concat(".png")
+
                     return MetadataViews.ExternalURL("https://ipfs.io/ipfs/".concat(thumbnailCID))
                 case Type<MetadataViews.NFTCollectionData>():
                     return MetadataViews.NFTCollectionData(
@@ -128,9 +128,7 @@ access(all) contract SturdyItems: ViewResolver {
                     let medias: [MetadataViews.Media] = [];
                         medias.append(
                             MetadataViews.Media(
-                                file: MetadataViews.HTTPFile(
-                                    url: "https://ipfs.io/ipfs/".concat(thumbnailCID)
-                                ),
+                                file: MetadataViews.IPFSFile(cid: "QmTPGjR5TN2QLMm6VN2Ux81NK955qqgvrjQkCwNDqW73fs", path: "someHoodlum_".concat(self.id.toString()).concat(".png")),
                                 mediaType: "image/png"
                             )
                         )
@@ -266,7 +264,7 @@ access(all) contract SturdyItems: ViewResolver {
 
         access(all) view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver} {
             let nft = (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?)!
-            return nft as! &SturdyItems.NFT
+            return nft
         }
 
         access(all) view fun getSupportedNFTTypes(): {Type: Bool} {
@@ -394,11 +392,12 @@ access(all) contract SturdyItems: ViewResolver {
                 return MetadataViews.NFTCollectionDisplay(
                         name: "Hoodlums",
                         description: "",
-                        externalURL: MetadataViews.ExternalURL("https://www.flowty.io/collection/0x427ceada271aa0b1/SturdyItems"),
+                        externalURL: MetadataViews.ExternalURL("https://www.hoodlums.io"),
                         squareImage: media,
                         bannerImage: media,
                         socials: {
-                            "twitter": MetadataViews.ExternalURL("https://x.com/HoodlumsNFT")
+                            "twitter": MetadataViews.ExternalURL("https://x.com/HoodlumsNFT"),
+                            "discord": MetadataViews.ExternalURL("https://discord.gg/ah2jynWk")
                         }
                     )
         }
