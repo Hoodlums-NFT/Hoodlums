@@ -36,6 +36,10 @@ access(all) contract SturdyItems: ViewResolver {
     //
     access(all) var totalSupply: UInt64
 
+    // Entitlements
+    //
+    access(all) entitlement MinterAdmin
+
     // NFT
     // A Sturdy Item as an NFT
     //
@@ -316,7 +320,7 @@ access(all) contract SturdyItems: ViewResolver {
         // price: UInt64
         // price: price
         // initPrice: price
-		access(all) fun mintNFT(recipient: &{NonFungibleToken.CollectionPublic}, 
+		access(MinterAdmin) fun mintNFT(recipient: &{NonFungibleToken.CollectionPublic}, 
 			typeID: UInt64, 
 			tokenURI: String, 
 			tokenTitle: String, 
