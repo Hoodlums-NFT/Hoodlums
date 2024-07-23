@@ -45,8 +45,8 @@ access(all) contract HoodlumsMetadata {
 
     self.metadata = {}
 
-    self.sturdyRoyaltyAddress = self.account.address
-    self.artistRoyaltyAddress = self.account.address
+    self.sturdyRoyaltyAddress = 0xbb4ed9133bdab28a
+    self.artistRoyaltyAddress = 0x985bafb3357d729b
     self.sturdyRoyaltyCut = 0.05
     self.artistRoyaltyCut = 0.05
 
