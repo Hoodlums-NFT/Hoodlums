@@ -113,17 +113,25 @@ access(all) contract SturdyItems: ViewResolver {
                         })
                     )
                 case Type<MetadataViews.NFTCollectionDisplay>():
-                    let media = MetadataViews.Media(
-                        file: MetadataViews.IPFSFile(cid: "bafkreigos42bix6eyvdqwgsbpwwpiemttt772g7ql5khsrutzrfflc4bpq", path: nil),
+                    let thumbnail = MetadataViews.Media(
+                        file: MetadataViews.IPFSFile(cid: "QmYQPsikmJxRAtCFGTa3coUoG6bZqduyckAwodUQ35T8p9", path: nil),
+                        mediaType: "image/jpeg"
+                    )
+
+                    let banner = MetadataViews.Media(
+                        file: MetadataViews.IPFSFile(cid: "QmPqVFuM2d4bSqFCjTddajaSb7AVYpDrRJuw3BeE8s1cRJ", path: nil),
                         mediaType: "image/jpeg"
                     )
                     return MetadataViews.NFTCollectionDisplay(
                         name: "Hoodlums",
-                        description: "",
-                        externalURL: MetadataViews.ExternalURL("https://hoodlumsnft.com/"),
-                        squareImage: media,
-                        bannerImage: media,
-                        socials: {}
+                        description: "Hoodlums NFT is a generative art project featuring 5,000 unique Hoodlum PFPs, crafted from hand-drawn traits by renowned memelord Somehoodlum. Created for creatives, by creatives, the project is owned and operated by Hoodlums holders through Hoodlums DAO. Hoodlums is the first PFP on the Flow Blockchain, minted in September 2021.",
+                        externalURL: MetadataViews.ExternalURL("https://www.hoodlums.io/"),
+                        squareImage: thumbnail,
+                        bannerImage: banner,
+                        socials: {
+                            "twitter": MetadataViews.ExternalURL("https://x.com/HoodlumsNFT"),
+                            "discord": MetadataViews.ExternalURL("https://discord.gg/ah2jynWk")
+                        }
                     )
                 case Type<MetadataViews.Traits>():
                     var metadata = HoodlumsMetadata.getMetadata(tokenID: self.id)
@@ -329,7 +337,7 @@ access(all) contract SturdyItems: ViewResolver {
 		 	secondaryRoyalty: String,  
 		 	platformMintedOn: String
         ) {
-            SturdyItems.totalSupply = SturdyItems.totalSupply + (1 as UInt64)
+            SturdyItems.totalSupply = SturdyItems.totalSupply + 1
             emit Minted(id: SturdyItems.totalSupply, 
             	typeID: typeID, 
             	tokenURI: tokenURI, 
@@ -389,16 +397,21 @@ access(all) contract SturdyItems: ViewResolver {
                         })
                 )
             case Type<MetadataViews.NFTCollectionDisplay>():
-                    let media = MetadataViews.Media(
-                        file: MetadataViews.IPFSFile(cid: "bafkreigos42bix6eyvdqwgsbpwwpiemttt772g7ql5khsrutzrfflc4bpq", path: nil),
+                    let thumbnail = MetadataViews.Media(
+                        file: MetadataViews.IPFSFile(cid: "QmYQPsikmJxRAtCFGTa3coUoG6bZqduyckAwodUQ35T8p9", path: nil),
+                        mediaType: "image/jpeg"
+                    )
+
+                    let banner = MetadataViews.Media(
+                        file: MetadataViews.IPFSFile(cid: "QmPqVFuM2d4bSqFCjTddajaSb7AVYpDrRJuw3BeE8s1cRJ", path: nil),
                         mediaType: "image/jpeg"
                     )
                 return MetadataViews.NFTCollectionDisplay(
                         name: "Hoodlums",
-                        description: "",
-                        externalURL: MetadataViews.ExternalURL("https://www.hoodlums.io"),
-                        squareImage: media,
-                        bannerImage: media,
+                        description: "Hoodlums NFT is a generative art project featuring 5,000 unique Hoodlum PFPs, crafted from hand-drawn traits by renowned memelord Somehoodlum. Created for creatives, by creatives, the project is owned and operated by Hoodlums holders through Hoodlums DAO. Hoodlums is the first PFP on the Flow Blockchain, minted in September 2021.",
+                        externalURL: MetadataViews.ExternalURL("https://www.hoodlums.io/"),
+                        squareImage: thumbnail,
+                        bannerImage: banner,
                         socials: {
                             "twitter": MetadataViews.ExternalURL("https://x.com/HoodlumsNFT"),
                             "discord": MetadataViews.ExternalURL("https://discord.gg/ah2jynWk")
