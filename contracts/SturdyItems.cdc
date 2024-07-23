@@ -306,15 +306,6 @@ access(all) contract SturdyItems: ViewResolver {
         return <- create Collection()
     }
 
-    // purchased
-    // Remain price information
-    //
-    access(all) fun purchased(recipient: Address, tokenID: UInt64, price: UInt64): UInt64 {
-        emit Purchased(buyer: recipient, id: tokenID, price: price)
-        return tokenID
-    }
-
-
     // NFTMinter
     // Resource that an admin or something similar would own to be
     // able to mint new NFTs
@@ -370,7 +361,7 @@ access(all) contract SturdyItems: ViewResolver {
     //
     access(all) fun fetch(_ from: Address, itemID: UInt64): &SturdyItems.NFT? {
         let collection = getAccount(from).capabilities
-            .get<&{NonFungibleToken.Collection}>(SturdyItems.CollectionPublicPath)
+            .get<&{NonFungibleToken.CollectionPublic}>(SturdyItems.CollectionPublicPath)
             .borrow()
             ?? panic("Couldn't get collection")
         let sturdyCollection = collection as! &SturdyItems.Collection
