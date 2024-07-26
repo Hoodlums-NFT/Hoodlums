@@ -98,10 +98,9 @@ access(all) contract SturdyItems: ViewResolver {
                         thumbnail: MetadataViews.IPFSFile(cid: "QmTPGjR5TN2QLMm6VN2Ux81NK955qqgvrjQkCwNDqW73fs", path: "someHoodlum_".concat(self.id.toString()).concat(".png")),
                     )
                 case Type<MetadataViews.ExternalURL>():
-                    let newCID = "QmTPGjR5TN2QLMm6VN2Ux81NK955qqgvrjQkCwNDqW73fs"
-                    let thumbnailCID = newCID.concat("/someHoodlum_").concat(self.id.toString()).concat(".png")
+                    let url = "https://flowty.io/collection/".concat(SturdyItems.account.address.toString()).concat("/SturdyItems/").concat(self.id.toString())
 
-                    return MetadataViews.ExternalURL("https://ipfs.io/ipfs/".concat(thumbnailCID))
+                    return MetadataViews.ExternalURL(url)
                 case Type<MetadataViews.NFTCollectionData>():
                     return MetadataViews.NFTCollectionData(
                         storagePath: SturdyItems.CollectionStoragePath,
