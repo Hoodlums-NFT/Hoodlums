@@ -7,7 +7,7 @@ import "ViewResolver"
 // SturdyItems
 // NFT items for Sturdy!
 //
-access(all) contract SturdyItems: ViewResolver {
+access(all) contract SturdyItems: ViewResolver, NonFungibleToken {
 
     // Events
     //
@@ -108,7 +108,7 @@ access(all) contract SturdyItems: ViewResolver {
                         publicCollection: Type<&SturdyItems.Collection>(),
                         publicLinkedType: Type<&SturdyItems.Collection>(),
                         createEmptyCollectionFunction: (fun (): @{NonFungibleToken.Collection} {
-                            return <-SturdyItems.createEmptyCollection()
+                            return <-SturdyItems.createEmptyCollection(nftType: Type<@NFT>())
                         })
                     )
                 case Type<MetadataViews.NFTCollectionDisplay>():
@@ -166,7 +166,7 @@ access(all) contract SturdyItems: ViewResolver {
         }
 
         access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
-            return <- SturdyItems.createEmptyCollection()
+            return <- SturdyItems.createEmptyCollection(nftType: Type<@NFT>())
         }
 
         // initializer
@@ -297,14 +297,6 @@ access(all) contract SturdyItems: ViewResolver {
         }
     }
 
-    // createEmptyCollection
-    // public function that anyone can call to create a new empty collection
-    //
-    access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
-        emit AccountInitialized()
-        return <- create Collection()
-    }
-
     // NFTMinter
     // Resource that an admin or something similar would own to be
     // able to mint new NFTs
@@ -383,7 +375,7 @@ access(all) contract SturdyItems: ViewResolver {
                         publicCollection: Type<&SturdyItems.Collection>(),
                         publicLinkedType: Type<&SturdyItems.Collection>(),
                         createEmptyCollectionFunction: (fun (): @{NonFungibleToken.Collection} {
-                            return <-SturdyItems.createEmptyCollection()
+                            return <-SturdyItems.createEmptyCollection(nftType: Type<@NFT>())
                         })
                 )
             case Type<MetadataViews.NFTCollectionDisplay>():
@@ -422,6 +414,14 @@ access(all) contract SturdyItems: ViewResolver {
             Type<MetadataViews.NFTCollectionDisplay>(),
             Type<MetadataViews.ExternalURL>()
         ]
+    }
+
+    access(all) fun createEmptyCollection(nftType: Type): @{NonFungibleToken.Collection} {
+        pre {
+            nftType == Type<@NFT>(): "incorrect nft type given"
+        }
+
+        return <- create Collection()
     }
 
     // initializer

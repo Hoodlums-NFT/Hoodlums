@@ -21,7 +21,7 @@
       }
     },
     "testnet-account": {
-      "address": "0x1",
+      "address": "0x79a981ca43c50bda",
       "key": {
         "type": "file",
         "location": "testnet-account.pkey"
