@@ -92,14 +92,16 @@ access(all) contract SturdyItems: ViewResolver, NonFungibleToken {
                         traits: MetadataViews.getTraits(viewResolver)
                     )
                 case Type<MetadataViews.Display>():
+                    let metadata = HoodlumsMetadata.getMetadata(tokenID: self.id)
+                    let thumbnailCID = metadata!["thumbnailCID"] != nil ? metadata!["thumbnailCID"]! : metadata!["imageCID"]!
+
                     return MetadataViews.Display(
                         name: self.tokenTitle,
                         description: self.tokenDescription,
-                        thumbnail: MetadataViews.IPFSFile(cid: "QmTPGjR5TN2QLMm6VN2Ux81NK955qqgvrjQkCwNDqW73fs", path: "someHoodlum_".concat(self.id.toString()).concat(".png")),
+                        thumbnail: MetadataViews.IPFSFile(cid: thumbnailCID, path: nil),
                     )
                 case Type<MetadataViews.ExternalURL>():
                     let url = "https://flowty.io/collection/".concat(SturdyItems.account.address.toString()).concat("/SturdyItems/").concat(self.id.toString())
-
                     return MetadataViews.ExternalURL(url)
                 case Type<MetadataViews.NFTCollectionData>():
                     return MetadataViews.NFTCollectionData(
@@ -136,10 +138,12 @@ access(all) contract SturdyItems: ViewResolver, NonFungibleToken {
                     var metadata = HoodlumsMetadata.getMetadata(tokenID: self.id)
                     return metadata
                 case Type<MetadataViews.Medias>():
+                    let metadata = HoodlumsMetadata.getMetadata(tokenID: self.id)
+                    let thumbnailCID = metadata!["thumbnailCID"] != nil ? metadata!["thumbnailCID"]! : metadata!["imageCID"]!
                     let medias: [MetadataViews.Media] = [];
                         medias.append(
                             MetadataViews.Media(
-                                file: MetadataViews.IPFSFile(cid: "QmTPGjR5TN2QLMm6VN2Ux81NK955qqgvrjQkCwNDqW73fs", path: "someHoodlum_".concat(self.id.toString()).concat(".png")),
+                                file: MetadataViews.IPFSFile(cid: thumbnailCID, path: nil),
                                 mediaType: "image/png"
                             )
                         )
