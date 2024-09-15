@@ -98,7 +98,9 @@ access(all) contract SturdyItems: ViewResolver, NonFungibleToken {
                     return MetadataViews.Display(
                         name: self.tokenTitle,
                         description: self.tokenDescription,
-                        thumbnail: MetadataViews.IPFSFile(cid: thumbnailCID, path: nil),
+                        thumbnail: MetadataViews.HTTPFile(
+                            url: "https://ipfs.io/ipfs/".concat(thumbnailCID)
+                        )
                     )
                 case Type<MetadataViews.ExternalURL>():
                     let url = "https://flowty.io/collection/".concat(SturdyItems.account.address.toString()).concat("/SturdyItems/").concat(self.id.toString())
@@ -143,7 +145,9 @@ access(all) contract SturdyItems: ViewResolver, NonFungibleToken {
                     let medias: [MetadataViews.Media] = [];
                         medias.append(
                             MetadataViews.Media(
-                                file: MetadataViews.IPFSFile(cid: thumbnailCID, path: nil),
+                                file: MetadataViews.HTTPFile(
+                                    url: "https://ipfs.io/ipfs/".concat(thumbnailCID)
+                                ),
                                 mediaType: "image/png"
                             )
                         )
@@ -152,7 +156,7 @@ access(all) contract SturdyItems: ViewResolver, NonFungibleToken {
                     return MetadataViews.Royalties(
                         [
                             MetadataViews.Royalty(
-                            receiver: getAccount(HoodlumsMetadata.sturdyRoyaltyAddress)
+                                receiver: getAccount(HoodlumsMetadata.sturdyRoyaltyAddress)
                                     .capabilities.get<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver),
                                 cut: HoodlumsMetadata.sturdyRoyaltyCut,
                                 description: "Sturdy Royalty"
