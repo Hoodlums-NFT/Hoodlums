@@ -92,14 +92,18 @@ access(all) contract SturdyItems: ViewResolver, NonFungibleToken {
                         traits: MetadataViews.getTraits(viewResolver)
                     )
                 case Type<MetadataViews.Display>():
+                    let metadata = HoodlumsMetadata.getMetadata(tokenID: self.id)
+                    let thumbnailCID = metadata!["thumbnailCID"] != nil ? metadata!["thumbnailCID"]! : metadata!["imageCID"]!
+
                     return MetadataViews.Display(
                         name: self.tokenTitle,
                         description: self.tokenDescription,
-                        thumbnail: MetadataViews.IPFSFile(cid: "QmTPGjR5TN2QLMm6VN2Ux81NK955qqgvrjQkCwNDqW73fs", path: "someHoodlum_".concat(self.id.toString()).concat(".png")),
+                        thumbnail: MetadataViews.HTTPFile(
+                            url: "https://ipfs.io/ipfs/".concat(thumbnailCID)
+                        )
                     )
                 case Type<MetadataViews.ExternalURL>():
                     let url = "https://flowty.io/collection/".concat(SturdyItems.account.address.toString()).concat("/SturdyItems/").concat(self.id.toString())
-
                     return MetadataViews.ExternalURL(url)
                 case Type<MetadataViews.NFTCollectionData>():
                     return MetadataViews.NFTCollectionData(
@@ -136,10 +140,14 @@ access(all) contract SturdyItems: ViewResolver, NonFungibleToken {
                     var metadata = HoodlumsMetadata.getMetadata(tokenID: self.id)
                     return metadata
                 case Type<MetadataViews.Medias>():
+                    let metadata = HoodlumsMetadata.getMetadata(tokenID: self.id)
+                    let thumbnailCID = metadata!["thumbnailCID"] != nil ? metadata!["thumbnailCID"]! : metadata!["imageCID"]!
                     let medias: [MetadataViews.Media] = [];
                         medias.append(
                             MetadataViews.Media(
-                                file: MetadataViews.IPFSFile(cid: "QmTPGjR5TN2QLMm6VN2Ux81NK955qqgvrjQkCwNDqW73fs", path: "someHoodlum_".concat(self.id.toString()).concat(".png")),
+                                file: MetadataViews.HTTPFile(
+                                    url: "https://ipfs.io/ipfs/".concat(thumbnailCID)
+                                ),
                                 mediaType: "image/png"
                             )
                         )
@@ -148,7 +156,7 @@ access(all) contract SturdyItems: ViewResolver, NonFungibleToken {
                     return MetadataViews.Royalties(
                         [
                             MetadataViews.Royalty(
-                            receiver: getAccount(HoodlumsMetadata.sturdyRoyaltyAddress)
+                                receiver: getAccount(HoodlumsMetadata.sturdyRoyaltyAddress)
                                     .capabilities.get<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver),
                                 cut: HoodlumsMetadata.sturdyRoyaltyCut,
                                 description: "Sturdy Royalty"
