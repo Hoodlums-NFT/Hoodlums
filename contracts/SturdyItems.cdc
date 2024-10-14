@@ -96,7 +96,7 @@ access(all) contract SturdyItems: ViewResolver, NonFungibleToken {
 // 10/14/2024 TC
               case Type<MetadataViews.Display>():
               	let hoodlumNumber = self.tokenTitle.filter(fun (char: Character): Bool {
-              	return char.isDigit
+              	return char.isDigit()
                 })
 
     		return MetadataViews.Display(
@@ -106,7 +106,7 @@ access(all) contract SturdyItems: ViewResolver, NonFungibleToken {
             	cid: "QmTPGjR5TN2QLMm6VN2Ux81NK955qqgvrjQkCwNDqW73fs",
             	path: "someHoodlum_".concat(hoodlumNumber).concat(".png")
                   )
-                  )
+                )
 
                 case Type<MetadataViews.ExternalURL>():
                     let url = "https://flowty.io/collection/".concat(SturdyItems.account.address.toString()).concat("/SturdyItems/").concat(self.id.toString())
@@ -215,6 +215,7 @@ access(all) contract SturdyItems: ViewResolver, NonFungibleToken {
     // This is the interface that users can cast their SturdyItems Collection as
     // to allow others to deposit SturdyItems into their Collection. It also allows for reading
     // the details of SturdyItems in the Collection.
+
     access(all) resource interface SturdyItemsCollectionPublic: NonFungibleToken.Collection {
         access(all) fun deposit(token: @{NonFungibleToken.NFT})
         access(all) view fun borrowSturdyItem(id: UInt64): &SturdyItems.NFT? {
