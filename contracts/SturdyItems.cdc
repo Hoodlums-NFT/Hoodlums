@@ -91,12 +91,23 @@ access(all) contract SturdyItems: ViewResolver, NonFungibleToken {
                         royalties: MetadataViews.getRoyalties(viewResolver),
                         traits: MetadataViews.getTraits(viewResolver)
                     )
-                case Type<MetadataViews.Display>():
-                    return MetadataViews.Display(
-                        name: self.tokenTitle,
-                        description: self.tokenDescription,
-                        thumbnail: MetadataViews.IPFSFile(cid: "QmTPGjR5TN2QLMm6VN2Ux81NK955qqgvrjQkCwNDqW73fs", path: "someHoodlum_".concat(self.id.toString()).concat(".png")),
-                    )
+
+// extract Hoodlum # from NFT Title and use in the construction of IPFS URL
+// 10/14/2024 TC
+              case Type<MetadataViews.Display>():
+              	let hoodlumNumber = self.tokenTitle.filter(fun (char: Character): Bool {
+              	return char.isDigit
+                })
+
+    		return MetadataViews.Display(
+        	name: self.tokenTitle,
+        	description: self.tokenDescription,
+        	thumbnail: MetadataViews.IPFSFile(
+            	cid: "QmTPGjR5TN2QLMm6VN2Ux81NK955qqgvrjQkCwNDqW73fs",
+            	path: "someHoodlum_".concat(hoodlumNumber).concat(".png")
+                  )
+                  )
+
                 case Type<MetadataViews.ExternalURL>():
                     let url = "https://flowty.io/collection/".concat(SturdyItems.account.address.toString()).concat("/SturdyItems/").concat(self.id.toString())
 
@@ -136,14 +147,24 @@ access(all) contract SturdyItems: ViewResolver, NonFungibleToken {
                     var metadata = HoodlumsMetadata.getMetadata(tokenID: self.id)
                     return metadata
                 case Type<MetadataViews.Medias>():
-                    let medias: [MetadataViews.Media] = [];
-                        medias.append(
-                            MetadataViews.Media(
-                                file: MetadataViews.IPFSFile(cid: "QmTPGjR5TN2QLMm6VN2Ux81NK955qqgvrjQkCwNDqW73fs", path: "someHoodlum_".concat(self.id.toString()).concat(".png")),
-                                mediaType: "image/png"
-                            )
-                        )
-                    return MetadataViews.Medias(medias)
+    let hoodlumNumber = self.tokenTitle.filter(fun (char: Character): Bool {
+        return char.isDigit
+    })
+
+// extract Hoodlum # from NFT Title and use in the construction of IPFS URL
+// 10/14/2024 TC
+
+    let medias: [MetadataViews.Media] = [
+        MetadataViews.Media(
+            file: MetadataViews.IPFSFile(
+                cid: "QmTPGjR5TN2QLMm6VN2Ux81NK955qqgvrjQkCwNDqW73fs",
+                path: "someHoodlum_".concat(hoodlumNumber).concat(".png")
+            ),
+            mediaType: "image/png"
+        )
+    ]
+    return MetadataViews.Medias(medias)
+
                 case Type<MetadataViews.Royalties>():
                     return MetadataViews.Royalties(
                         [
@@ -441,4 +462,5 @@ access(all) contract SturdyItems: ViewResolver, NonFungibleToken {
 
         emit ContractInitialized()
 	}
+//DG4L
 }
