@@ -342,7 +342,7 @@ access(all) contract SturdyItems: ViewResolver, NonFungibleToken {
                 )
                 return MetadataViews.NFTCollectionDisplay(
                     name: "Hoodlums",
-                    description: "Hoodlums NFT is a generative art project featuring 5,000 unique Hoodlum PFPs.",
+                    description: "Hoodlums NFT is a generative art project featuring 5,000 unique Hoodlum PFPs, crafted from hand-drawn traits by renowned memelord Somehoodlum. Created for creatives, by creatives, the project is owned and operated by Hoodlums holders through Hoodlums DAO. Hoodlums is the first PFP on the Flow Blockchain, minted in September 2021.",
                     externalURL: MetadataViews.ExternalURL("https://www.hoodlums.io/"),
                     squareImage: thumbnail,
                     bannerImage: banner,
