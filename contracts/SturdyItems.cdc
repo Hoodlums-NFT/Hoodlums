@@ -81,11 +81,12 @@ access(all) fun getLumNum(_ str: String): String {
     var digits: String = ""
     for char in str {
         if char >= "0" && char <= "9" {  // Compare character directly
-            digits = digits.concat(char)  // Concatenate the character to the string
+            digits = digits.concat(char.toString())  // Convert character to string before concatenation
         }
     }
     return digits
 }
+
 
 
 
