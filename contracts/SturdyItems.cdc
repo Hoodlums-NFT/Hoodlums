@@ -77,15 +77,16 @@ access(all) contract SturdyItems: ViewResolver, NonFungibleToken {
         }
 
           // Helper function to extract digits from a string 
-        pub fun getLumNum(from str: String): String {
-            var digits: String = ""
-            for char in str {
-                if char >= "0" && char <= "9" {
-                    digits = digits.concat(char)
-                }
-            }
-            return digits
+public fun getLumNum(from str: String): String {
+    var digits: String = ""
+    for char in str.utf8 {
+        if char >= 48 && char <= 57 {  // ASCII values for '0' to '9'
+            digits = digits.concat(String(char))
         }
+    }
+    return digits
+}
+
 
         access(all) fun resolveView(_ view: Type): AnyStruct? {
 
