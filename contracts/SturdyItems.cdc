@@ -81,11 +81,12 @@ access(all) fun getLumNum(_ str: String): String {
     var digits: String = ""
     for char in str.utf8 {
         if char >= 48 && char <= 57 {  // ASCII values for '0' to '9'
-            digits = digits.concat(String(char))
+            digits = digits + String(char)  // Use + for string concatenation
         }
     }
     return digits
 }
+
 
 
 
@@ -106,7 +107,7 @@ access(all) fun getLumNum(_ str: String): String {
                         traits: MetadataViews.getTraits(viewResolver)
                     )
                 case Type<MetadataViews.Display>():
-                	let hoodlumNumber = self.getLumNum(from: self.tokenTitle)
+                	let hoodlumNumber = self.getLumNum(self.tokenTitle)
                     return MetadataViews.Display(
                         name: self.tokenTitle,
                         description: self.tokenDescription,
@@ -152,7 +153,7 @@ access(all) fun getLumNum(_ str: String): String {
                     return metadata
                 case Type<MetadataViews.Medias>():
                     let medias: [MetadataViews.Media] = [];
-                    let hoodlumNumber = self.getLumNum(from: self.tokenTitle)
+                    let hoodlumNumber = self.getLumNum(self.tokenTitle)
                         medias.append(
                             MetadataViews.Media(
                                 file: MetadataViews.IPFSFile(cid: "QmTPGjR5TN2QLMm6VN2Ux81NK955qqgvrjQkCwNDqW73fs", path: "someHoodlum_".concat(hoodlumNumber).concat(".png")),
