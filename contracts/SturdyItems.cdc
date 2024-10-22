@@ -77,7 +77,7 @@ access(all) contract SturdyItems: ViewResolver, NonFungibleToken {
         }
 
 // Helper function to extract digits from a string
-pub fun getLumNum(_ str: String): String {
+access(all) fun getLumNum(_ str: String): String {
     var digits: String = ""
     for char in str.utf8 {
         if char >= 48 && char <= 57 {  // ASCII values for '0' to '9'
@@ -86,6 +86,7 @@ pub fun getLumNum(_ str: String): String {
     }
     return digits
 }
+
 
 
 
