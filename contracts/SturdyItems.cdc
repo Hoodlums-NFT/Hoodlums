@@ -79,14 +79,14 @@ access(all) contract SturdyItems: ViewResolver, NonFungibleToken {
 // Helper function to extract digits from a string
 access(all) fun getLumNum(_ str: String): String {
     var digits: String = ""
-    for char in str.utf8 {
-        if char >= 48 && char <= 57 {  // ASCII values for '0' to '9'
-            let charAsString = "\(char)"  // Interpolate the character to a String
-            digits = digits.concat(charAsString)  // Concatenate strings
+    for char in str {
+        if char >= "0" && char <= "9" {  // Compare character directly
+            digits = digits.concat(char)  // Concatenate the character to the string
         }
     }
     return digits
 }
+
 
 
 
