@@ -81,7 +81,7 @@ access(all) fun getLumNum(_ str: String): String {
     var digits: String = ""
     for char in str.utf8 {
         if char >= 48 && char <= 57 {  // ASCII values for '0' to '9'
-            digits = digits + String(char)  // Use + for string concatenation
+            digits = digits.concat(String(char))  // Correct concat usage
         }
     }
     return digits
