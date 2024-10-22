@@ -81,11 +81,13 @@ access(all) fun getLumNum(_ str: String): String {
     var digits: String = ""
     for char in str.utf8 {
         if char >= 48 && char <= 57 {  // ASCII values for '0' to '9'
-            digits = digits.concat(String(char))  // Correct concat usage
+            let charAsString = String(char)  // Convert char to String first
+            digits = digits.concat(charAsString)  // Concatenate strings
         }
     }
     return digits
 }
+
 
 
 
